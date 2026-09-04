@@ -2,8 +2,9 @@
 
 A full-stack CRM for managing leads, customers, and deals through a sales pipeline, with role-based access control for Admins, Sales Managers, and Sales Executives.
 
-**Live demo:** _add your deployed frontend URL here once live_
-**API:** _add your deployed backend URL here once live_
+**Live demo:** https://salespilot-crm-flame.vercel.app
+**API:** https://salespilot-backend-7xqi.onrender.com/api
+**API docs (Swagger):** https://salespilot-backend-7xqi.onrender.com/api-docs
 
 ---
 
@@ -20,7 +21,7 @@ A full-stack CRM for managing leads, customers, and deals through a sales pipeli
 **Backend**
 - Node.js + Express
 - MongoDB (Atlas) with Mongoose
-- JWT authentication (httpOnly cookies)
+- JWT authentication (Bearer token, stored client-side)
 - bcrypt for password hashing
 
 **Deployment**
@@ -33,7 +34,8 @@ A full-stack CRM for managing leads, customers, and deals through a sales pipeli
 ## Features
 
 ### Authentication & Access Control
-- Register / Login / Logout with JWT stored in httpOnly cookies
+- Register / Login / Logout with JWT
+- Auth token is sent as an `Authorization: Bearer <token>` header on every request. (The backend also supports an httpOnly cookie for same-origin/local-dev use, but the deployed frontend and backend live on different domains — Vercel and Render — and modern browsers block cross-domain cookies by default, so the header-based token is the source of truth in production.)
 - Three roles with different data visibility, enforced **server-side**, not just hidden in the UI:
   - **Admin** — sees and manages everyone's data
   - **Sales Manager** — sees their team's data, can reassign within their team
