@@ -28,8 +28,8 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await login(form).unwrap();
-      dispatch(setCredentials(res.user));
-      toast.success(`Welcome back, ${res.user.name.split(" ")[0]}`);
+dispatch(setCredentials(res));   // ← pass the whole response now
+toast.success(`Welcome back, ${res.user.name.split(" ")[0]}`);
       navigate(from, { replace: true });
     } catch (err) {
       toast.error(err?.data?.message || "Login failed. Check your credentials.");

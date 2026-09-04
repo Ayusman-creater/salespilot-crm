@@ -2,12 +2,16 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
-  credentials: "include", // send httpOnly cookie with every request
+  credentials: "include", // still send the cookie too, for local dev (same-origin)
+  prepareHeaders: (headers, { getState }) => {
+    const token = getState().auth?.token;
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+    return headers;
+  },
 });
 
-// Central API slice — all feature endpoints are injected into this via injectEndpoints
-// so we get one shared cache, consistent tag invalidation, and one place to configure
-// base behavior (auth headers, error handling, base URL).
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery,

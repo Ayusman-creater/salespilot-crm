@@ -25,8 +25,8 @@ const Register = () => {
     e.preventDefault();
     try {
       const res = await registerUser(form).unwrap();
-      dispatch(setCredentials(res.user));
-      toast.success(`Welcome, ${res.user.name.split(" ")[0]}`);
+dispatch(setCredentials(res));
+toast.success(`Welcome, ${res.user.name.split(" ")[0]}`);
       navigate("/dashboard", { replace: true });
     } catch (err) {
       const msg = err?.data?.errors?.[0]?.message || err?.data?.message || "Registration failed";
