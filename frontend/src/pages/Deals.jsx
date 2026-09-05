@@ -66,10 +66,28 @@ const DealCard = ({ deal, onMove }) => {
   );
 };
 
+const StageColumn = ({ stage, deals, onMove }) => (
+  <div className={`bg-slate-50 rounded-md border-t-4 ${STAGE_COLORS[stage]} p-3 min-h-[300px]`}>
+    <div className="flex items-center justify-between mb-3">
+      <h3 className="text-sm font-semibold text-slate-700">{stage}</h3>
+      <span className="text-xs text-slate-400 bg-white px-1.5 py-0.5 rounded-full border border-slate-200 tabular-nums">
+        {deals.length}
+      </span>
+    </div>
+    <div className="space-y-2">
+      {deals.length === 0 ? (
+        <p className="text-xs text-slate-400 text-center py-4">No deals</p>
+      ) : (
+        deals.map((deal) => <DealCard key={deal._id} deal={deal} onMove={onMove} />)
+      )}
+    </div>
+  </div>
+);
+
 const Deals = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [assignedTo, setAssignedTo] = useState("");
-  const [statusFilter, setStatusFilter] = useState(""); // "", "Open", "Won", "Lost"
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     const status = searchParams.get("status");
@@ -117,7 +135,9 @@ const Deals = () => {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Deals Pipeline</h1>
-          <p className="text-sm text-slate-500 mt-1">Qualification → Discovery → Proposal → Negotiation → Won/Lost</p>
+          <p className="text-sm text-slate-500 mt-1 hidden sm:block">
+            Qualification → Discovery → Proposal → Negotiation → Won/Lost
+          </p>
         </div>
         {hasActiveFilter && (
           <button
@@ -132,27 +152,24 @@ const Deals = () => {
       {isLoading ? (
         <div className="text-slate-500">Loading pipeline…</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 overflow-x-auto">
-          {STAGES.map((stage) => (
-            <div key={stage} className={`bg-slate-50 rounded-md border-t-4 ${STAGE_COLORS[stage]} p-3 min-h-[300px]`}>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-slate-700">{stage}</h3>
-                <span className="text-xs text-slate-400 bg-white px-1.5 py-0.5 rounded-full border border-slate-200 tabular-nums">
-                  {dealsByStage[stage].length}
-                </span>
+        <>
+          {/* Mobile (<md): horizontal swipe-through columns, one card-width visible
+              at a time with scroll-snap, like a native Kanban swipe. */}
+          <div className="md:hidden -mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+            {STAGES.map((stage) => (
+              <div key={stage} className="snap-start shrink-0 w-[85vw] max-w-[320px]">
+                <StageColumn stage={stage} deals={dealsByStage[stage]} onMove={handleMove} />
               </div>
-              <div className="space-y-2">
-                {dealsByStage[stage].length === 0 ? (
-                  <p className="text-xs text-slate-400 text-center py-4">No deals</p>
-                ) : (
-                  dealsByStage[stage].map((deal) => (
-                    <DealCard key={deal._id} deal={deal} onMove={handleMove} />
-                  ))
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          {/* Tablet/desktop (md+): normal grid, all columns visible at once. */}
+          <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {STAGES.map((stage) => (
+              <StageColumn key={stage} stage={stage} deals={dealsByStage[stage]} onMove={handleMove} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

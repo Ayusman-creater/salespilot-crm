@@ -22,7 +22,7 @@ const PRIORITIES = ["Low", "Medium", "High"];
 const emptyForm = { name: "", email: "", phone: "", company: "", source: "Website", priority: "Medium" };
 
 const selectClasses =
-  "px-3 py-2 border border-slate-200 rounded-md text-sm bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500";
+  "px-3 py-2 border border-slate-200 rounded-md text-sm bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 w-full sm:w-auto";
 const inputClasses =
   "w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500";
 
@@ -32,7 +32,6 @@ const Leads = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState(emptyForm);
 
-  // Pick up dashboard deep-links: /leads?status=New, /leads?new=1
   useEffect(() => {
     const statusParam = searchParams.get("status");
     if (statusParam && STATUSES.includes(statusParam)) {
@@ -76,21 +75,21 @@ const Leads = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Leads</h1>
           <p className="text-sm text-slate-500 mt-1">Manage and track incoming leads.</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors"
+          className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors shrink-0"
         >
           <Plus size={16} strokeWidth={2} /> New Lead
         </button>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-md p-4 flex flex-wrap gap-3 items-center">
-        <div className="relative flex-1 min-w-[200px]">
+      <div className="bg-white border border-slate-200 rounded-md p-4 flex flex-col sm:flex-row flex-wrap gap-3 sm:items-center">
+        <div className="relative flex-1 min-w-full sm:min-w-[200px]">
           <Search size={16} strokeWidth={1.75} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             placeholder="Search leads…"
@@ -99,30 +98,34 @@ const Leads = () => {
             className={`${inputClasses} pl-9`}
           />
         </div>
-        <select value={filters.status} onChange={(e) => updateFilter("status", e.target.value)} className={selectClasses}>
-          <option value="">All Statuses</option>
-          {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <select value={filters.priority} onChange={(e) => updateFilter("priority", e.target.value)} className={selectClasses}>
-          <option value="">All Priorities</option>
-          {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
-        </select>
-        <select value={filters.source} onChange={(e) => updateFilter("source", e.target.value)} className={selectClasses}>
-          <option value="">All Sources</option>
-          {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
+        <div className="grid grid-cols-3 sm:flex gap-2 sm:gap-3">
+          <select value={filters.status} onChange={(e) => updateFilter("status", e.target.value)} className={selectClasses}>
+            <option value="">All Statuses</option>
+            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select value={filters.priority} onChange={(e) => updateFilter("priority", e.target.value)} className={selectClasses}>
+            <option value="">All Priorities</option>
+            {PRIORITIES.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <select value={filters.source} onChange={(e) => updateFilter("source", e.target.value)} className={selectClasses}>
+            <option value="">All Sources</option>
+            {SOURCES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
         {activeFilterCount > 0 && (
           <button
             onClick={() => setFilters({ status: "", priority: "", source: "", search: "", page: 1 })}
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 px-2"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 px-2 text-left sm:text-center"
           >
             Clear filters
           </button>
         )}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-md overflow-hidden">
-        <table className="w-full text-sm">
+      {/* overflow-x-auto: on narrow screens the table scrolls horizontally
+          within its own card instead of squashing columns unreadably. */}
+      <div className="bg-white border border-slate-200 rounded-md overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead className="bg-slate-50 text-slate-500 text-left border-b border-slate-200">
             <tr>
               <th className="px-4 py-2.5 font-medium">Name</th>
@@ -145,17 +148,17 @@ const Leads = () => {
             ) : (
               leads.map((lead) => (
                 <tr key={lead._id} className={`hover:bg-slate-50 transition-colors ${isFetching ? "opacity-50" : ""}`}>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <Link to={`/leads/${lead._id}`} className="font-medium text-indigo-600 hover:underline">
                       {lead.name}
                     </Link>
                     {lead.email && <div className="text-xs text-slate-400">{lead.email}</div>}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{lead.company || "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{lead.source}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{lead.company || "—"}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{lead.source}</td>
                   <td className="px-4 py-3"><Badge tone={STATUS_TONE[lead.status]}>{lead.status}</Badge></td>
                   <td className="px-4 py-3"><Badge tone={PRIORITY_TONE[lead.priority]}>{lead.priority}</Badge></td>
-                  <td className="px-4 py-3 text-slate-600">{lead.assignedTo?.name || "Unassigned"}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{lead.assignedTo?.name || "Unassigned"}</td>
                 </tr>
               ))
             )}
@@ -164,7 +167,7 @@ const Leads = () => {
       </div>
 
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-slate-500">
           <span>
             Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
           </span>
@@ -172,14 +175,14 @@ const Leads = () => {
             <button
               disabled={!pagination.hasPrevPage}
               onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-              className="px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
+              className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
             >
               Previous
             </button>
             <button
               disabled={!pagination.hasNextPage}
               onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-              className="px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
+              className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
             >
               Next
             </button>
@@ -189,7 +192,7 @@ const Leads = () => {
 
       {showCreate && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-md w-full max-w-md p-6 shadow-lg">
+          <div className="bg-white rounded-md w-full max-w-md p-6 shadow-lg max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-900">New Lead</h2>
               <button onClick={closeCreate} className="text-slate-400 hover:text-slate-600">

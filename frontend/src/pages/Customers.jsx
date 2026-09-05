@@ -22,7 +22,7 @@ const Customers = () => {
       </div>
 
       <div className="bg-white border border-slate-200 rounded-md p-4">
-        <div className="relative max-w-sm">
+        <div className="relative w-full sm:max-w-sm">
           <Search size={16} strokeWidth={1.75} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             placeholder="Search customers…"
@@ -33,8 +33,10 @@ const Customers = () => {
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-md overflow-hidden">
-        <table className="w-full text-sm">
+      {/* overflow-x-auto: on narrow screens the table scrolls horizontally
+          within its own card instead of squashing columns unreadably. */}
+      <div className="bg-white border border-slate-200 rounded-md overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead className="bg-slate-50 text-slate-500 text-left border-b border-slate-200">
             <tr>
               <th className="px-4 py-2.5 font-medium">Name</th>
@@ -56,15 +58,15 @@ const Customers = () => {
             ) : (
               customers.map((c) => (
                 <tr key={c._id} className={`hover:bg-slate-50 transition-colors ${isFetching ? "opacity-50" : ""}`}>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <Link to={`/customers/${c._id}`} className="font-medium text-indigo-600 hover:underline">
                       {c.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{c.company || "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{c.email || "—"}</td>
-                  <td className="px-4 py-3 text-slate-600">{c.assignedTo?.name || "Unassigned"}</td>
-                  <td className="px-4 py-3 text-slate-500 tabular-nums">{new Date(c.createdAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{c.company || "—"}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{c.email || "—"}</td>
+                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{c.assignedTo?.name || "Unassigned"}</td>
+                  <td className="px-4 py-3 text-slate-500 tabular-nums whitespace-nowrap">{new Date(c.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))
             )}
@@ -73,20 +75,20 @@ const Customers = () => {
       </div>
 
       {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-slate-500">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-slate-500">
           <span>Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)</span>
           <div className="flex gap-2">
             <button
               disabled={!pagination.hasPrevPage}
               onClick={() => setFilters((f) => ({ ...f, page: f.page - 1 }))}
-              className="px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
+              className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
             >
               Previous
             </button>
             <button
               disabled={!pagination.hasNextPage}
               onClick={() => setFilters((f) => ({ ...f, page: f.page + 1 }))}
-              className="px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
+              className="flex-1 sm:flex-none px-3 py-1.5 border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50 transition-colors"
             >
               Next
             </button>
